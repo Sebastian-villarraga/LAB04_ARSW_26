@@ -7,7 +7,10 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.springframework.context.annotation.Profile;
 
+
+@Profile("inmemory")
 @Repository
 public class InMemoryBlueprintPersistence implements BlueprintPersistence {
 
