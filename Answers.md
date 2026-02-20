@@ -75,3 +75,17 @@ Se realizón un POST y un GET básicos para comprobar que en efecto funciona la 
 
 Luego de esto, se procedió a consultar como tal la terminal para así estar seguros de la utilización de esta base de datos:
 ![DBTerminal.png](Images/DBTerminal.png)
+
+### **Parte 3. Buenas prácticas de API REST**
+#### **1. Versionado y Enrutamiento Semántico**
+Se modificó el path base de los controladores para incluir el contexto de la aplicación y el versionado de la API. Este proceso fue realizado en el archivo `BlueprintsAPIController.java`
+- Nuevo Path: `/api/v1/blueprints`
+- Justificación: El prefijo `/api` separa claramente las rutas de datos de cualquier posible contenido estático, mientras que `/v1` (Versión 1) establece un contrato inicial. Esto permite que en el futuro se puedan introducir cambios drásticos (lanzando un /v2) sin romper las aplicaciones de los clientes que siguen consumiendo la versión anterior.
+
+#### **2. Códigos de Estado HTTP Precisos**
+Se reemplazó el uso genérico de respuestas con un manejo estricto y semántico de los códigos de estado HTTP, informando al cliente exactamente qué ocurrió con su petición:
+- `200 OK`: Utilizado para consultas exitosas (ej. obtener todos los planos o un plano específico).
+- `201 Created`: Devuelto exclusivamente cuando un nuevo plano es guardado exitosamente en la base de datos a través de un `POST`.
+- `202 Accepted`: Implementado para indicar que una solicitud de actualización (ej. agregar un nuevo punto a un plano existente) fue recibida y procesada correctamente.
+- `400 Bad Request`: Utilizado cuando el cliente envía un cuerpo de petición mal formado o con datos inválidos (ej. un punto sin coordenadas).
+- `404 Not Found`: Lanzado mediante el manejo de excepciones (`BlueprintNotFoundException`) cuando se solicita un autor o plano que no existe en los registros de PostgreSQL.
