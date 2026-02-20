@@ -2,7 +2,7 @@
 
 **Elaborado Por**
 
-Sebatián Villarraga
+Sebastián Villarraga
 
 Juan Carlos Leal Cruz
 
