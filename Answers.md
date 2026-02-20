@@ -89,3 +89,21 @@ Se reemplazó el uso genérico de respuestas con un manejo estricto y semántico
 - `202 Accepted`: Implementado para indicar que una solicitud de actualización (ej. agregar un nuevo punto a un plano existente) fue recibida y procesada correctamente.
 - `400 Bad Request`: Utilizado cuando el cliente envía un cuerpo de petición mal formado o con datos inválidos (ej. un punto sin coordenadas).
 - `404 Not Found`: Lanzado mediante el manejo de excepciones (`BlueprintNotFoundException`) cuando se solicita un autor o plano que no existe en los registros de PostgreSQL.
+
+#### **4. Estandarización de Respuestas**
+Para evitar que los clientes consuman estructuras de datos inconsistentes (a veces un objeto, a veces una lista, a veces un mensaje de texto puro), se implementó un contenedor genérico utilizando la característica de inmutabilidad de los Records de Java. Esto se realizó haciendo uso de:
+```
+public record ApiResponseWrapper<T>(
+        int code,
+        String message,
+        T data
+) {}
+```
+
+De tal forma que el usuario ve la siguiente información:
+- `code`: Refleja el código HTTP o un código de negocio interno.
+- `message`: Provee un mensaje descriptivo en lenguaje natural (ej. "Blueprint creado exitosamente" o "Autor no encontrado").
+- `data`: Un campo genérico (`T`) que transporta el payload real (puede ser un único `Blueprint`, una lista de ellos, o null en caso de error).
+
+Aquí hay un ejemplo de cómo lo ve el usuario al momento de un `POST`:
+![CodeEv.png](Images/CodeEv.png)
