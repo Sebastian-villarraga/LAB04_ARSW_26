@@ -1,3 +1,5 @@
+# NOTA: Toda la parte de registro y documentación de lo realizado se encuentra en el archivo Answers.md
+
 ## Laboratorio #4 – REST API Blueprints (Java 21 / Spring Boot 3.3.x)
 # Escuela Colombiana de Ingeniería – Arquitecturas de Software  
 
