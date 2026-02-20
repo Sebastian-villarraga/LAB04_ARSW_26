@@ -107,3 +107,26 @@ De tal forma que el usuario ve la siguiente información:
 
 Aquí hay un ejemplo de cómo lo ve el usuario al momento de un `POST`:
 ![CodeEv.png](Images/CodeEv.png)
+
+### **Parte 4. Documentación Automática con OpenAPI / Swagger**
+Para garantizar que la API sea descubrible y mantenga un contrato claro entre el Backend y cualquier posible cliente, se implementó la especificación OpenAPI. Esta herramienta genera "documentación viva" que se actualiza automáticamente conforme el código evoluciona.
+
+#### **1. Integración con `springdoc-openapi`**
+Se incluyó la dependencia `springdoc-openapi-starter-webmvc-ui` (versión 2.6.0) en el archivo `pom.xml.
+- Justificación: A diferencia de mantener documentación en archivos de texto estáticos que rápidamente quedan obsoletos, esta librería inspecciona el código en tiempo de ejecución de Spring Boot 3 y genera la especificación OpenAPI dinámicamente. Esto reduce la carga de mantenimiento y asegura que la documentación sea siempre la fuente de información verídica.
+
+#### **2. Configuración Global y Metadatos**
+Se creó la clase `OpenApiConfig` para definir los metadatos principales del servicio mediante un `@Bean` de tipo OpenAPI.
+- Justificación: Permite establecer el contexto del proyecto, definiendo el título ("ARSW Blueprints API"), la versión ("v1") y la información de contacto de los autores. Esto es fundamental cuando la API se expone a equipos externos o se publica en un portal de desarrolladores.
+
+#### **3. Enriquecimiento Semántico de Endpoints**
+Para que la interfaz gráfica sea realmente útil, se decoró el controlador `BlueprintsAPIController` con anotaciones específicas que explican el comportamiento del sistema:
+- Agrupación (`@Tag`): Se definió a nivel de clase para agrupar bajo el nombre "Blueprints API" todas las operaciones relacionadas con los planos arquitectónicos.
+- Descripciones (`@Operation`): Se utilizó en cada método (ej. `summary = "Create a new blueprint"`) para describir claramente qué hace el endpoint y qué se espera de él.
+- Contratos de Respuesta (`@ApiResponses` y `@ApiResponse`): Se mapearon los posibles códigos HTTP de respuesta definidos en el paso anterior (200 OK, 201 Created, 202 Accepted, 404 Not Found) junto con su respectiva descripción. Esto le indica al cliente exactamente qué estructura (el `ApiResponseWrapper`) va a recibir.
+- Ejemplos Interactivos (`@Parameter` y `@Schema`): Se enriquecieron las variables de ruta y los cuerpos de petición (`NewBlueprintRequest`) con ejemplos concretos (ej. `author = "john", name = "house"`). Esto facilita enormemente el uso de la interfaz de pruebas.
+
+#### **4. Interfaz Interactiva (Swagger UI)**
+Toda esta configuración se materializa en una interfaz gráfica accesible desde el navegador.
+- Acceso: Una vez levantada la aplicación, la documentación interactiva está disponible en la ruta `/swagger-ui/index.html` (o `/swagger-ui.html` como redirección).
+![Swagger.png](Images/Swagger.png)
