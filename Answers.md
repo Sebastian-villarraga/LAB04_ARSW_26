@@ -130,3 +130,36 @@ Para que la interfaz gráfica sea realmente útil, se decoró el controlador `Bl
 Toda esta configuración se materializa en una interfaz gráfica accesible desde el navegador.
 - Acceso: Una vez levantada la aplicación, la documentación interactiva está disponible en la ruta `/swagger-ui/index.html` (o `/swagger-ui.html` como redirección).
 ![Swagger.png](Images/Swagger.png)
+
+### **Parte 5. Filtrado de Datos**
+Para optimizar la transferencia de datos y adaptar la respuesta de la API según las necesidades del cliente (por ejemplo, dispositivos con recursos limitados o redes lentas), se implementó un mecanismo de filtrado sobre los puntos que componen un plano arquitectónico.
+En lugar de modificar la lógica central del servicio (`BlueprintsServices`) llenándola de condicionales `if/else`, se delegó esta responsabilidad aplicando el patrón de diseño Estrategia soportado por los perfiles de Spring Boot.
+
+#### **1. La interfaz de Filtrado**
+Se definió la interfaz `BlueprintsFilter` con un único método `apply(Blueprint bp)`. Esto establece un contrato claro: cualquier filtro que se cree en el futuro debe recibir un plano, procesarlo y devolver un plano resultante, garantizando que el servicio principal no necesite saber cómo se filtran los datos.
+
+#### **2. Implementación de los Filtros**
+Se desarrollaron tres implementaciones distintas de la interfaz para manejar diferentes escenarios de negocio:
+- `RedundancyFilter: Itera sobre la lista de puntos y elimina cualquier punto que sea idéntico a su predecesor inmediato.
+  
+  **Justificación:** Es ideal para limpiar "ruido" en los datos, como cuando un usuario en el Frontend hace doble clic por error en la misma coordenada al dibujar.
+- `UndersamplingFilter`: Reduce la densidad del plano conservando únicamente 1 de cada 2 puntos (los índices pares), omitiendo los impares.
+
+  **Justificación:** Funciona como un mecanismo de compresión (downsampling) muy útil cuando se deben renderizar planos excesivamente grandes y detallados en dispositivos móviles o conexiones de bajo ancho de banda.
+- `IdentityFilter`: Devuelve el plano exactamente igual, sin alteraciones.
+
+  **Justificación:** Actúa como un comportamiento por defecto seguro, garantizando que si no se requiere ningún filtro específico, la aplicación no falle al intentar inyectar la dependencia.
+
+#### **3. Activación Dinámica mediante Spring Profiles**
+El aspecto más potente de esta implementación es cómo se decide qué filtro utilizar en tiempo de ejecución utilizando la anotación `@Profile` sobre los componentes (`@Component`). Esto permite cambiar el comportamiento de toda la API simplemente modificando la configuración de arranque, sin recompilar el código Java:
+- `@Profile("redundancy")`: Le indica al contenedor de Spring (IoC) que inyecte el `RedundancyFilter` únicamente si el perfil "redundancy" está activo.
+- `@Profile("undersampling")`: Inyecta el `UndersamplingFilter` solo si el perfil "undersampling" está activo.
+- `@Profile("!redundancy & !undersampling")`: Es una expresión lógica que garantiza que el `IdentityFilter` sea inyectado como opción predeterminada cuando ninguno de los otros dos perfiles haya sido activado explícitamente.
+
+**¿Cómo probarlo**
+
+Para activar uno de estos filtros al levantar la aplicación, basta con modificar el archivo `application.properties` agregando la siguiente línea:
+```
+spring.profiles.active=redundancy     #Dependiendo del perfil a usar
+```
+
