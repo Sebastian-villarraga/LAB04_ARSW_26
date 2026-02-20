@@ -66,5 +66,12 @@ Se implementó la migración en dos capas:
   - Inyección de Dependencias: Se utilizó la anotación `@Primary` en esta clase. Gracias a esto, el contenedor de inversión de control (IoC) de Spring le da prioridad sobre la versión en memoria, inyectándola automáticamente en los servicios sin modificar la lógica de negocio existente.
   - Mapeo de Datos: Se implementó un método interno `mapToModel()` encargado de traducir las entidades extraídas de la base de datos (`BluePrintEntity`) a los objetos de dominio puros (`Blueprint`) requeridos por el contrato de la interfaz.
 
+#### **6. Pruebas de Funcionamiento**
+Se realizón un POST y un GET básicos para comprobar que en efecto funciona la base de datos PostgreSQL haciendo uso de Postman:
+- **POST**
+  ![Post.png](Images/Post.png)
+- **GET**
+  ![Get.png](Images/Get.png)
 
-
+Luego de esto, se procedió a consultar como tal la terminal para así estar seguros de la utilización de esta base de datos:
+![DBTerminal.png](Images/DBTerminal.png)
